@@ -1,0 +1,20 @@
+namespace: monk-trino
+
+trino:
+  metadata:
+    defines: metadata
+    name: Trino
+    description: Trino is a high performance, distributed SQL query engine for big data.
+    website: https://trino.io
+    publisher: monk.io
+    icon: https://trino.io/assets/images/trino-logo/trino-ko_tiny-alt.svg
+  defines: runnable
+  variables:
+    volume_local:
+      type: string
+      value: <- `${monk-volume-path}/trino`
+  containers:
+    monk-trino:
+      image: 'trinodb/trino'
+      ports:
+        - <- `0.0.0.0:${trino_port}:8080`

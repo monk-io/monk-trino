@@ -1,0 +1,10 @@
+namespace: monk-trino
+
+stack:
+  defines: process-group
+  runnable-list:
+    - monk-trino/trino
+  variables:
+    trino_port:
+      type: int
+      value: 8086
