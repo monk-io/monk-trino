@@ -70,9 +70,8 @@ The variables are in `stack.yml` file. You can quickly setup by editing the valu
 
 | Variable                     	| Description                               	|
 |------------------------------	|-------------------------------------------	|
-| vault_port                    | Vault Warden port, Default: 8084 	               |
-| vaultwarden_signup_enabled                    | Signup enable, Default: true 	               |
-| vaultwarden_admin_token                    | admin password, Default: monk 	               |
+| trino_port                    | Trino web port, Default 8086	               |
+
 
 
 
