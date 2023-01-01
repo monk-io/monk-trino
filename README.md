@@ -1,13 +1,16 @@
 # Trino & Monk
+
 This repository contains Monk.io template to deploy Trino & Monk either locally or on cloud of your choice (AWS, GCP, Azure, Digital Ocean).
 
-# Prerequisites
+## Prerequisites
+
 - [Install Monk](https://docs.monk.io/docs/get-monk)
 - [Register and Login Monk](https://docs.monk.io/docs/acc-and-auth)
 - [Add Cloud Provider](https://docs.monk.io/docs/cloud-provider)
 - [Add Instance](https://docs.monk.io/docs/multi-cloud)
 
-#### Make sure monkd is running.
+### Make sure monkd is running
+
 ```bash
 foo@bar:~$ monk status
 daemon: ready
@@ -16,18 +19,20 @@ not connected to cluster
 ```
 
 ## Clone Repository
+
 ```bash
-git clone https://github.com/Burakhan/monk-trino
+git clone https://github.com/monk-io/monk-trino
 ```
 
 ## Load Template
+
 ```bash
 cd monk-trino
 monk load MANIFEST
 ```
 
+### Let's take a look at the themes I have installed
 
-#### Let's take a look at the themes I have installed.
 ```bash
 foo@bar:~$ monk list monk-trino
 ✔ Got the list
@@ -37,6 +42,7 @@ runnable  monk-trino/trino  local       -        -
 ```
 
 ## Deploy Stack
+
 ```bash
 foo@bar:~$ monk run monk-trino/stack
 ? Select tag to run [local/monk-trino/stack] on: mnk
@@ -55,30 +61,26 @@ foo@bar:~$ monk run monk-trino/stack
           └─🔌 open 13.51.200.163:8086 (0.0.0.0:8086) -> 8080
 
 💡 You can inspect and manage your above stack with these commands:
-	monk logs (-f) local/monk-trino/stack - Inspect logs
-	monk shell     local/monk-trino/stack - Connect to the container's shell
-	monk do        local/monk-trino/stack/action_name - Run defined action (if exists)
+ monk logs (-f) local/monk-trino/stack - Inspect logs
+ monk shell     local/monk-trino/stack - Connect to the container's shell
+ monk do        local/monk-trino/stack/action_name - Run defined action (if exists)
 💡 Check monk help for more!
 ```
+
 ## Check admin gui
 
 `http://13.49.137.107:8084/`
 
-
 ## Variables
+
 The variables are in `stack.yml` file. You can quickly setup by editing the values here.
 
-| Variable                     	| Description                               	|
-|------------------------------	|-------------------------------------------	|
-| trino_port                    | Trino web port, Default 8086	               |
-
-
-
-
+| Variable                         | Description              | Defaults                                                 |
+|----------------------------------|--------------------------|-----------------------|
+| trino_port                       | Trino web port           | 8086            |
 
 ## Stop, remove and clean up workloads and templates
 
 ```bash
 monk purge -x -a
 ```
-
