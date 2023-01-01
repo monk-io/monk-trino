@@ -58,7 +58,7 @@ foo@bar:~$ monk run monk-trino/stack
     └─🔩 templates/local/monk-trino/trino
        └─📦 019faad75e1cf1237bc5f81384a51073-al-monk-trino-trino-monk-trino
           ├─🧩 trinodb/trino:latest
-          └─🔌 open 13.51.200.163:8086 (0.0.0.0:8086) -> 8080
+          └─🔌 open <ip>:8086 (0.0.0.0:8086) -> 8080
 
 💡 You can inspect and manage your above stack with these commands:
  monk logs (-f) local/monk-trino/stack - Inspect logs
@@ -69,7 +69,7 @@ foo@bar:~$ monk run monk-trino/stack
 
 ## Check admin gui
 
-`http://13.49.137.107:8084/`
+`http://<ip>:8084/`
 
 ## Variables
 
