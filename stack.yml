@@ -1,9 +1,9 @@
-namespace: monk-trino
+namespace: trino
 
 stack:
   defines: process-group
   runnable-list:
-    - monk-trino/trino
+    - trino/trino
   variables:
     trino_port:
       type: int

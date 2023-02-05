@@ -1,4 +1,4 @@
-namespace: monk-trino
+namespace: trino
 
 trino:
   metadata:
@@ -14,13 +14,13 @@ trino:
       type: string
       value: <- `${monk-volume-path}/trino`
   containers:
-    monk-trino:
+    trino:
       image: 'trinodb/trino'
       ports:
         - <- `0.0.0.0:${trino_port}:8080`
   services:
     trino-svc:
-      container: monk-trino
+      container: trino
       port: 8080
       protocol: tcp
       host-port: <- `${trino_port}`
