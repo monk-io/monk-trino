@@ -1,3 +1,4 @@
+---
 namespace: trino
 
 trino:
@@ -15,12 +16,10 @@ trino:
       value: <- `${monk-volume-path}/trino`
   containers:
     trino:
-      image: 'trinodb/trino'
-      ports:
-        - <- `0.0.0.0:${trino_port}:8080`
+      image: trinodb/trino
   services:
     trino-svc:
       container: trino
       port: 8080
       protocol: tcp
-      host-port: <- `${trino_port}`
+      host-port: 8086
