@@ -1,2 +1,2 @@
 REPO trino
-LOAD trino.yml stack.yml
+LOAD trino.yml

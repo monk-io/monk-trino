@@ -1,7 +1,0 @@
----
-namespace: trino
-
-stack:
-  defines: process-group
-  runnable-list:
-    - trino/trino
