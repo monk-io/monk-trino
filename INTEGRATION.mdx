@@ -1,0 +1,233 @@
+---
+title: Trino (formerly Presto SQL)
+description: Ready-to-run Trino container template for fast distributed SQL query engine for big data analytics.
+primary_category: analytics
+tags: [trino, presto, sql, query-engine, template, runnable, big-data, analytics, data-lake]
+integration_type: template
+hosting_models: [self-hosted]
+website_url: https://trino.io/
+docs_url: https://trino.io/docs/current/
+publisher: monk.io
+---
+
+## Overview
+
+This template provides a production‑ready Trino instance as a Monk runnable. You can:
+
+- Run it directly to get a managed distributed SQL query engine
+- Inherit it in your own data infrastructure to query data across multiple sources
+
+Trino (formerly Presto SQL) is a fast distributed SQL query engine for big data analytics. It allows you to query data where it lives, whether in Hadoop, S3, Cassandra, MySQL, or dozens of other data sources, using standard SQL.
+
+## What this template manages
+
+- Trino coordinator
+- Trino workers (optional, for distributed setup)
+- Web UI and query interface
+- Catalog configuration for data sources
+- Query execution engine
+- Web UI on port 8080
+
+## Quick start (run directly)
+
+1) Load templates
+
+```bash
+monk load MANIFEST
+```
+
+2) Run Trino with defaults
+
+```bash
+monk run trino/trino
+```
+
+3) Customize configuration (recommended via inheritance)
+
+Running directly uses the defaults defined in this template's `variables`. Secrets added with `monk secrets add` will not affect this runnable unless you inherit it and reference those secrets.
+
+- Preferred: inherit and replace variables with `secret("...")` as shown below.
+- Alternative: fork/clone and edit the `variables` in `trino/trino.yml`, then `monk load MANIFEST` and run.
+
+Once started:
+- Web UI: `http://localhost:8080`
+- Connect with Trino CLI or JDBC: `jdbc:trino://localhost:8080/catalog/schema`
+
+## Configuration
+
+Key variables you can customize in this template:
+
+```yaml
+variables:
+  # Trino
+  trino-image-tag: "latest"              # container image tag
+  trino-port: "8080"                     # HTTP port (env: TRINO_PORT)
+  discovery-uri: "http://localhost:8080" # discovery service URI
+  
+  # Performance
+  query-max-memory: "5GB"                # max memory per query
+  query-max-memory-per-node: "1GB"       # max memory per node
+  heap-size: "2G"                        # JVM heap size
+```
+
+Data and configuration are persisted under `${monk-volume-path}/trino` on the host. Custom catalog configurations are mounted from `${monk-volume-path}/trino/catalog:/etc/trino/catalog`.
+
+## Use by inheritance (recommended for data platforms)
+
+Inherit the Trino runnable in your data platform and declare connections. Example:
+
+```yaml
+namespace: mydata
+query-engine:
+  defines: runnable
+  inherits: trino/trino
+  files:
+    postgres-catalog:
+      container: trino
+      path: /etc/trino/catalog/postgresql.properties
+      contents: |
+        connector.name=postgresql
+        connection-url=jdbc:postgresql://postgres:5432/mydb
+        connection-user=<- secret("db-user")
+        connection-password=<- secret("db-password")
+api:
+  defines: runnable
+  containers:
+    api:
+      image: myorg/analytics-api
+  connections:
+    analytics:
+      runnable: query-engine
+      service: trino
+  variables:
+    trino-host:
+      value: <- connection-hostname("analytics")
+    trino-port:
+      value: "8080"
+```
+
+Then set the secrets once and run your data platform group:
+
+```bash
+monk secrets add -g db-user="trino"
+monk secrets add -g db-password="STRONG_PASSWORD"
+monk run mydata/api
+```
+
+## Ports and connectivity
+
+- Service: `trino` on TCP port `8080`
+- Web UI: `http://localhost:8080`
+- JDBC: `jdbc:trino://localhost:8080/catalog/schema`
+- From other runnables in the same process group, use `connection-hostname("<connection-name>")` to resolve the Trino host.
+
+## Persistence and configuration
+
+- Data path: `${monk-volume-path}/trino:/etc/trino`
+- Catalog path: `${monk-volume-path}/trino/catalog:/etc/trino/catalog`
+- You can drop additional catalog `.properties` files into the catalog path to configure data source connectors.
+
+## Features
+
+- **Fast Queries**: In-memory distributed execution
+- **Federated Queries**: Query across multiple data sources in one SQL
+- **Standard SQL**: ANSI SQL support
+- **40+ Connectors**: PostgreSQL, MySQL, S3, Hive, Kafka, Elasticsearch, etc.
+- **Scalable**: Add workers for horizontal scaling
+- **No ETL**: Query data where it lives, no data movement
+- **BI Tool Integration**: Tableau, Looker, Metabase, Superset
+
+## Supported Connectors
+
+- **RDBMS**: PostgreSQL, MySQL, Oracle, SQL Server
+- **NoSQL**: MongoDB, Cassandra, Redis
+- **Cloud Storage**: S3, GCS, Azure Blob
+- **Data Lakes**: Hive, Iceberg, Delta Lake
+- **Streaming**: Kafka, Kinesis
+- **Search**: Elasticsearch, OpenSearch
+- **And 40+ more...**
+
+## Catalog Configuration
+
+Example PostgreSQL catalog (`/etc/trino/catalog/postgresql.properties`):
+
+```properties
+connector.name=postgresql
+connection-url=jdbc:postgresql://postgres:5432/mydb
+connection-user=trino
+connection-password=secret
+```
+
+Example S3/Hive catalog:
+
+```properties
+connector.name=hive
+hive.metastore.uri=thrift://hive-metastore:9083
+hive.s3.aws-access-key=AKIAIOSFODNN7EXAMPLE
+hive.s3.aws-secret-key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+```
+
+## Querying with Trino
+
+Connect with Trino CLI:
+
+```bash
+trino --server localhost:8080 --catalog postgresql --schema public
+```
+
+Run queries:
+
+```sql
+-- Query PostgreSQL
+SELECT * FROM postgresql.public.users LIMIT 10;
+
+-- Federated query across multiple sources
+SELECT u.name, o.total
+FROM postgresql.public.users u
+JOIN mysql.sales.orders o ON u.id = o.user_id
+WHERE o.created_at > DATE '2024-01-01';
+
+-- Query S3 data lake
+SELECT * FROM hive.default.events
+WHERE dt = '2024-01-01';
+```
+
+## Use cases
+
+Trino excels at:
+- Data lake analytics
+- Federated queries across silos
+- Interactive analytics on big data
+- Ad-hoc SQL queries
+- BI and reporting on distributed data
+- ETL and data pipeline queries
+- Real-time analytics
+
+
+## Related templates
+
+- Data warehouses: `postgresql/`, `clickhouse/`, for connecting to RDBMS
+- ETL tools: `airflow/`, `dagster/` for data pipeline orchestration
+- BI platforms: Use Trino as a data source for Tableau, Looker, Metabase, or Superset
+
+## Troubleshooting
+
+- **Access Web UI**: Navigate to `http://localhost:8080` to view running queries and statistics
+- **Check catalog connections**:
+
+```sql
+SHOW CATALOGS;
+SHOW SCHEMAS FROM catalog_name;
+```
+
+- **Check logs**:
+
+```bash
+monk logs -l 500 -f trino/trino
+```
+
+- **Slow queries**: Check query plan with `EXPLAIN` statement
+- **Connector issues**: Verify catalog configuration files in `${monk-volume-path}/trino/catalog`
+- **Memory errors**: Increase `query-max-memory` or `query-max-memory-per-node` variables
+- **Resource monitoring**: Use Web UI to monitor CPU, memory, and query performance
+- **Query history**: Review failed queries in Web UI for troubleshooting
